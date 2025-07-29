@@ -1,0 +1,421 @@
+﻿<ui:FluentWindow x:Class="MusicPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MusicPlayer"
+        xmlns:converters="clr-namespace:MusicPlayer.Converters"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="Music Player" Height="650" Width="950"
+        WindowBackdropType="Mica"
+        WindowCornerPreference="Round"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterScreen">
+
+    <ui:FluentWindow.Resources>
+        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+        
+        <!-- Title Bar Button Styles -->
+        <Style x:Key="TitleBarButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#1AFFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#2AFFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="CloseButtonStyle" TargetType="Button" BasedOn="{StaticResource TitleBarButtonStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E81123"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#C50E1F"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:SpectrumHeightConverter x:Key="SpectrumHeightConverter"/>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title Bar -->
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Custom Title Bar -->
+        <Grid Grid.Row="0" Height="32" Background="Transparent" x:Name="TitleBarGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Title Area (Draggable) -->
+            <Grid Grid.Column="0" Background="Transparent" x:Name="DragArea">
+                <TextBlock Text="Music Player" VerticalAlignment="Center" Margin="15,0,0,0" 
+                          FontSize="14" FontWeight="SemiBold" Opacity="0.8"/>
+            </Grid>
+            
+            <!-- Window Control Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button x:Name="MinimizeButton" Width="46" Height="32" Background="Transparent" 
+                        BorderThickness="0" Click="MinimizeButton_Click"
+                        Style="{DynamicResource TitleBarButtonStyle}">
+                    <TextBlock Text="&#xE921;" FontFamily="Segoe Fluent Icons" FontSize="10" 
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                </Button>
+                <Button x:Name="MaximizeButton" Width="46" Height="32" Background="Transparent" 
+                        BorderThickness="0" Click="MaximizeButton_Click"
+                        Style="{DynamicResource TitleBarButtonStyle}">
+                    <TextBlock x:Name="MaximizeButtonText" Text="&#xE922;" FontFamily="Segoe Fluent Icons" FontSize="10" 
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                </Button>
+                <Button x:Name="CloseButton" Width="46" Height="32" Background="Transparent" 
+                        BorderThickness="0" Click="CloseButton_Click"
+                        Style="{DynamicResource CloseButtonStyle}">
+                    <TextBlock Text="&#xE8BB;" FontFamily="Segoe Fluent Icons" FontSize="10" 
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Playlist -->
+            <Border Grid.Column="0" Background="#19FFFFFF" CornerRadius="8,0,0,8" Margin="10,10,0,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Playlist" FontSize="18" FontWeight="SemiBold" Margin="15"/>
+                    
+                    <!-- Search Box -->
+                    <ui:TextBox Grid.Row="1" Margin="15,0,15,10" PlaceholderText="Search songs..."
+                               Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                    
+                    <ListBox Grid.Row="2" ItemsSource="{Binding FilteredPlaylist}" Background="Transparent" BorderThickness="0" AlternationCount="2"
+                             SelectionChanged="PlaylistSelectionChanged">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="15,10"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#2CFFFFFF"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#1AFFFFFF"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Artist}" FontSize="12" Opacity="0.7"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Center Content -->
+            <Grid Grid.Column="1" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Album Art -->
+                <Border Grid.Row="0" Width="250" Height="250" CornerRadius="125" Margin="0,20,0,0"
+                        HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="15" Color="Black" Opacity="0.4"/>
+                    </Border.Effect>
+                    <Border.RenderTransform>
+                        <RotateTransform x:Name="AlbumArtRotateTransform" CenterX="125" CenterY="125"/>
+                    </Border.RenderTransform>
+                    <Ellipse>
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding CurrentSong.AlbumArt}" Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard Name="SpinningStoryboard">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.Angle"
+                                                                 From="0" To="360" Duration="0:0:10"
+                                                                 RepeatBehavior="Forever"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                    <DataTrigger.ExitActions>
+                                        <StopStoryboard BeginStoryboardName="SpinningStoryboard"/>
+                                    </DataTrigger.ExitActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+
+                <!-- Song Info -->
+                <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,20,0,20" TextBlock.TextAlignment="Center">
+                    <TextBlock Text="{Binding CurrentSong.Title, FallbackValue='Select a Song'}" FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentSong.Artist, FallbackValue='Unknown Artist'}" FontSize="16" Opacity="0.8"/>
+                    <TextBlock Text="{Binding CurrentSong.Album, FallbackValue='Unknown Album'}" FontSize="14" Opacity="0.6"/>
+                </StackPanel>
+
+                <!-- Lyrics -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Lyrics Section -->
+                    <ListBox Grid.Column="0" x:Name="LyricsListBox" ItemsSource="{Binding Lyrics}" SelectedItem="{Binding CurrentLyricLine}"
+                             Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Center"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.CanContentScroll="False">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Focusable" Value="False"/>
+                                <Setter Property="Padding" Value="5"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="ItemBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                                <TextBlock Text="{Binding Text}" FontSize="16" TextAlignment="Center"
+                                                           Opacity="0.6" FontWeight="Normal" TextWrapping="Wrap"
+                                                           LineHeight="20" MaxWidth="400" Margin="10,5"
+                                                           x:Name="LyricTextBlock">
+                                                </TextBlock>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="LyricTextBlock" Property="Opacity" Value="1"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="LyricTextBlock" Property="Foreground" Value="{DynamicResource SystemAccentColorPrimaryBrush}"/>
+                                                    <Setter TargetName="LyricTextBlock" Property="FontSize" Value="18"/>
+                                                    <Setter TargetName="LyricTextBlock" Property="FontWeight" Value="Bold"/>
+                                                    <Setter TargetName="LyricTextBlock" Property="Opacity" Value="1"/>
+                                                    <Setter TargetName="ItemBorder" Property="Background" Value="#0AFFFFFF"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <!-- Remove the old triggers since they're now in the template -->
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    
+                    <!-- Audio Visualizer -->
+                    <Border Grid.Column="1" Width="200" Margin="20,0,0,0" Background="#0AFFFFFF" CornerRadius="8">
+                        <Grid Margin="10">
+                            <TextBlock Text="Audio Spectrum" FontSize="12" FontWeight="SemiBold" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Top" Opacity="0.7"/>
+                            <ItemsControl ItemsSource="{Binding SpectrumData}" Margin="0,25,0,0">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Rows="1"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="1,0" VerticalAlignment="Bottom" Width="4" CornerRadius="2"
+                                                Background="{DynamicResource SystemAccentColorPrimaryBrush}">
+                                            <Border.Height>
+                                                <Binding Path="." Converter="{StaticResource SpectrumHeightConverter}">
+                                                    <Binding.ConverterParameter>120</Binding.ConverterParameter>
+                                                </Binding>
+                                            </Border.Height>
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="{DynamicResource SystemAccentColor}" 
+                                                                  BlurRadius="3" 
+                                                                  ShadowDepth="0" 
+                                                                  Opacity="0.6"/>
+                                            </Border.Effect>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Control Bar -->
+        <Border Grid.Row="2" Background="#19FFFFFF" CornerRadius="8" Margin="10,0,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:Button Command="{Binding PreviousCommand}" ToolTip="Previous">
+                        <TextBlock Text="&#xE892;" FontFamily="Segoe Fluent Icons"/>
+                    </ui:Button>
+                    <ui:Button Command="{Binding PlayPauseCommand}" ToolTip="Play/Pause">
+                        <TextBlock FontFamily="Segoe Fluent Icons">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE768;"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="&#xE769;"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </ui:Button>
+                    <ui:Button Command="{Binding StopCommand}" ToolTip="Stop">
+                        <TextBlock Text="&#xE71A;" FontFamily="Segoe Fluent Icons"/>
+                    </ui:Button>
+                    <ui:Button Command="{Binding NextCommand}" ToolTip="Next">
+                        <TextBlock Text="&#xE893;" FontFamily="Segoe Fluent Icons"/>
+                    </ui:Button>
+                </StackPanel>
+
+                <!-- Time Display -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                    <TextBlock Text="{Binding CurrentTimeText}" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text=" / " FontSize="14" VerticalAlignment="Center" Opacity="0.7"/>
+                    <TextBlock Text="{Binding TotalTimeText}" FontSize="14" VerticalAlignment="Center" Opacity="0.7"/>
+                </StackPanel>
+
+                <Slider Grid.Column="2" VerticalAlignment="Center" Margin="20,0"
+                        Value="{Binding CurrentPosition, Mode=TwoWay}" Maximum="{Binding MaxPosition}"/>
+
+                <!-- Volume Control -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                    <ui:Button Command="{Binding MuteCommand}" ToolTip="Mute/Unmute" Width="40">
+                        <TextBlock FontFamily="Segoe Fluent Icons">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE767;"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMuted}" Value="True">
+                                            <Setter Property="Text" Value="&#xE74F;"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </ui:Button>
+                    <Slider Value="{Binding Volume, Mode=TwoWay}" Minimum="0" Maximum="1" 
+                            Width="80" VerticalAlignment="Center" Margin="5,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:Button Command="{Binding TogglePlayModeCommand}" ToolTip="{Binding PlayModeText}" Margin="0,0,5,0">
+                        <TextBlock FontFamily="Segoe Fluent Icons">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="&#xE8EE;"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CurrentPlayMode}" Value="RepeatOne">
+                                            <Setter Property="Text" Value="&#xE8ED;"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentPlayMode}" Value="RepeatAll">
+                                            <Setter Property="Text" Value="&#xE8EE;"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CurrentPlayMode}" Value="Shuffle">
+                                            <Setter Property="Text" Value="&#xE8B1;"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </ui:Button>
+                    <ui:Button Command="{Binding AddMusicCommand}" ToolTip="Add Music Files">
+                        <TextBlock Text="&#xE710;" FontFamily="Segoe Fluent Icons"/>
+                    </ui:Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+    <ui:FluentWindow.Style>
+        <Style TargetType="ui:FluentWindow">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPlaying}" Value="False">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ui:FluentWindow">
+                                <Border>
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ui:FluentWindow">
+                                <Border>
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </ui:FluentWindow.Style>
+</ui:FluentWindow>

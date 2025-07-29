@@ -1,0 +1,157 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio 2015 cache/options directory
+.vs/
+# Visual Studio 2017 cache/options directory
+.vs
+# Editor Test Hook for VS
+.editorconfig
+
+# Visual Studio Code files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Rider files
+.idea/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-agent*.log
+nunit-server*.log
+
+# Build Results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+Generated_files/
+
+# BenchmarkDotNet
+BenchmarkDotNet.Artifacts/
+
+# StyleCop
+StyleCopReport.xml
+
+# FxCop
+FxCopReport.xml
+
+# Fakes
+FakesAssemblies/
+
+# GhostDoc
+*.GhostDoc.xml
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Paket
+.paket/paket.exe
+paket-files/
+
+# Roslyn
+*.ruleset
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# TeamCity
+_TeamCity*
+
+# DotCover
+*.dotCover
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+
+# MightyMoose
+*.mm.*
+AutoTest.Net/
+
+# Web workbench
+.sass-cache/
+
+# Installshield
+[Ii]nstall[Ss]hield*
+
+# Vault
+.vault
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder containing files with sensitive information
+.secrets/
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Coverage files
+*.coverage
+*.coveragexml
+
+# C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+
+# CMake
+CMake/
+
+# Subversion
+.svn
+
+# Docker
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+
+# Mac
+.DS_Store
+
+# Publish folder
+publish/
