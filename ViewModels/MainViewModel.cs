@@ -184,6 +184,13 @@ namespace MusicPlayer.ViewModels
             set { _spectrumData = value; OnPropertyChanged(); }
         }
 
+        private bool _isPlaylistCollapsed = false;
+        public bool IsPlaylistCollapsed
+        {
+            get => _isPlaylistCollapsed;
+            set { _isPlaylistCollapsed = value; OnPropertyChanged(); }
+        }
+
         public enum PlayMode
         {
             Normal,
@@ -221,6 +228,7 @@ namespace MusicPlayer.ViewModels
         public ICommand AddMusicCommand { get; }
         public ICommand MuteCommand { get; }
         public ICommand TogglePlayModeCommand { get; }
+        public ICommand TogglePlaylistCommand { get; }
 
         public MainViewModel()
         {
@@ -235,6 +243,7 @@ namespace MusicPlayer.ViewModels
             AddMusicCommand = new RelayCommand(AddMusic);
             MuteCommand = new RelayCommand(ToggleMute);
             TogglePlayModeCommand = new RelayCommand(TogglePlayMode);
+            TogglePlaylistCommand = new RelayCommand(TogglePlaylist);
 
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromMilliseconds(30); // Update every 30ms for smooth visualization
@@ -639,6 +648,11 @@ namespace MusicPlayer.ViewModels
         private void ToggleMute()
         {
             IsMuted = !IsMuted;
+        }
+
+        private void TogglePlaylist()
+        {
+            IsPlaylistCollapsed = !IsPlaylistCollapsed;
         }
 
         private string FormatTime(TimeSpan time)

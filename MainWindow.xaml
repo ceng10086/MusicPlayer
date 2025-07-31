@@ -58,6 +58,7 @@
         
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <converters:SpectrumHeightConverter x:Key="SpectrumHeightConverter"/>
+        <converters:PlaylistWidthConverter x:Key="PlaylistWidthConverter"/>
     </ui:FluentWindow.Resources>
 
     <Grid>
@@ -106,7 +107,11 @@
         <!-- Main Content -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition>
+                    <ColumnDefinition.Width>
+                        <Binding Path="IsPlaylistCollapsed" Converter="{StaticResource PlaylistWidthConverter}"/>
+                    </ColumnDefinition.Width>
+                </ColumnDefinition>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -118,14 +123,76 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Playlist" FontSize="18" FontWeight="SemiBold" Margin="15"/>
+                    
+                    <!-- Playlist Header with Toggle Button -->
+                    <Grid Grid.Row="0" Margin="15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Playlist" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaylistCollapsed}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <ui:Button Grid.Column="1" Command="{Binding TogglePlaylistCommand}" 
+                                   Width="30" Height="30" Padding="0" ToolTip="Toggle Playlist">
+                            <ui:Button.Style>
+                                <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaylistCollapsed}" Value="True">
+                                            <Setter Property="Grid.Column" Value="0"/>
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Style>
+                            <TextBlock FontFamily="Segoe Fluent Icons" FontSize="12">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="&#xE76C;"/> <!-- ChevronLeft -->
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaylistCollapsed}" Value="True">
+                                                <Setter Property="Text" Value="&#xE76B;"/> <!-- ChevronRight -->
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </ui:Button>
+                    </Grid>
                     
                     <!-- Search Box -->
                     <ui:TextBox Grid.Row="1" Margin="15,0,15,10" PlaceholderText="Search songs..."
-                               Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                               Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}">
+                        <ui:TextBox.Style>
+                            <Style TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaylistCollapsed}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:TextBox.Style>
+                    </ui:TextBox>
                     
                     <ListBox Grid.Row="2" ItemsSource="{Binding FilteredPlaylist}" Background="Transparent" BorderThickness="0" AlternationCount="2"
                              SelectionChanged="PlaylistSelectionChanged">
+                        <ListBox.Style>
+                            <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaylistCollapsed}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Padding" Value="15,10"/>

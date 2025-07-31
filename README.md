@@ -22,6 +22,7 @@
 ### 📚 播放列表
 - **本地音乐导入**: 支持单文件或批量导入音乐文件
 - **搜索筛选**: 快速搜索和筛选播放列表中的歌曲
+- **折叠功能**: 支持播放列表折叠/展开，节省界面空间
 - **数据持久化**: 使用 JSON 文件本地存储播放列表信息
 - **便携设计**: 所有数据文件与程序在同一目录，便于移植
 
@@ -62,7 +63,8 @@ MusicPlayer/
 │   ├── SpectrumAnalyzer.cs        # 频谱分析器
 │   └── VorbisAudioFileReader.cs   # OGG 格式音频读取器
 ├── Converters/                     # WPF 值转换器
-│   └── SpectrumHeightConverter.cs # 频谱高度转换器
+│   ├── SpectrumHeightConverter.cs # 频谱高度转换器
+│   └── PlaylistWidthConverter.cs  # 播放列表宽度转换器
 ├── Models/                         # 数据模型
 │   ├── Song.cs                    # 歌曲信息模型
 │   └── LyricLine.cs               # 歌词行模型
@@ -71,7 +73,8 @@ MusicPlayer/
 ├── ViewModels/                     # 视图模型
 │   ├── MainViewModel.cs           # 主视图模型
 │   └── ObservableObject.cs       # MVVM 基类
-└── 需求文档.md                     # 项目需求文档
+└── docx/                          # 文档目录
+    └── 需求文档.md                 # 项目需求文档
 ```
 
 ## 🚀 快速开始
@@ -135,6 +138,7 @@ dotnet publish -c Release --self-contained true -r win-x64 -p:PublishSingleFile=
 2. **播放音乐**: 双击歌曲列表中的歌曲开始播放
 3. **播放控制**: 使用底部播放控制面板进行播放/暂停/切换操作
 4. **搜索歌曲**: 在搜索框中输入关键词快速查找歌曲
+5. **折叠播放列表**: 点击播放列表右上角的箭头按钮折叠/展开播放列表
 
 ### 高级功能
 - **歌词显示**: 放置同名的 `.lrc` 或 `.srt` 歌词文件在音乐文件同目录
@@ -166,6 +170,11 @@ dotnet publish -c Release --self-contained true -r win-x64 -p:PublishSingleFile=
 - 音乐文件元数据读取
 - JSON 数据序列化和持久化
 - 多格式音频文件支持
+
+#### PlaylistWidthConverter.cs
+- 播放列表宽度动态转换器
+- 支持折叠/展开状态的布局切换
+- 响应式界面布局管理
 
 ### 依赖包说明
 - **WPF-UI**: 提供 Fluent Design 风格的现代 WPF 控件
