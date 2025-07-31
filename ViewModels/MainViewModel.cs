@@ -38,6 +38,10 @@ namespace MusicPlayer.ViewModels
                 bool wasPlaying = IsPlaying;
                 _currentSong = value;
                 OnPropertyChanged();
+                
+                // Update background blur effect
+                UpdateBackgroundEffect();
+                
                 LoadAndPlaySong();
                 
                 // If music was playing before, start playing the new song
@@ -189,6 +193,13 @@ namespace MusicPlayer.ViewModels
         {
             get => _isPlaylistCollapsed;
             set { _isPlaylistCollapsed = value; OnPropertyChanged(); }
+        }
+
+        private double _backgroundBlurRadius = 30.0;
+        public double BackgroundBlurRadius
+        {
+            get => _backgroundBlurRadius;
+            set { _backgroundBlurRadius = value; OnPropertyChanged(); }
         }
 
         public enum PlayMode
@@ -677,6 +688,13 @@ namespace MusicPlayer.ViewModels
                 }
             }
             return null;
+        }
+
+        private void UpdateBackgroundEffect()
+        {
+            // Update blur radius based on whether we have album art
+            // Use a stronger blur for better aesthetic effect
+            BackgroundBlurRadius = CurrentSong?.AlbumArt != null ? 40.0 : 0.0;
         }
     }
 

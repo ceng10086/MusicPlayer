@@ -59,6 +59,8 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <converters:SpectrumHeightConverter x:Key="SpectrumHeightConverter"/>
         <converters:PlaylistWidthConverter x:Key="PlaylistWidthConverter"/>
+        <converters:BlurEffectConverter x:Key="BlurEffectConverter"/>
+        <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter"/>
     </ui:FluentWindow.Resources>
 
     <Grid>
@@ -67,6 +69,80 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
+        <!-- Background Image with Blur Effect -->
+        <Border x:Name="BackgroundContainer" Grid.RowSpan="3">
+            <Border.Background>
+                <ImageBrush ImageSource="{Binding CurrentSong.AlbumArt}" 
+                           Stretch="UniformToFill" 
+                           Opacity="0.6">
+                    <ImageBrush.RelativeTransform>
+                        <ScaleTransform ScaleX="1.05" ScaleY="1.05" CenterX="0.5" CenterY="0.5"/>
+                    </ImageBrush.RelativeTransform>
+                </ImageBrush>
+            </Border.Background>
+            <Border.Effect>
+                <Binding Path="BackgroundBlurRadius" Converter="{StaticResource BlurEffectConverter}"/>
+            </Border.Effect>
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Opacity" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentSong.AlbumArt, Converter={StaticResource NotNullToBooleanConverter}}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                       To="1" Duration="0:0:0.8" 
+                                                       AccelerationRatio="0.3" DecelerationRatio="0.3"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                       To="0" Duration="0:0:0.5"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
+        
+        <!-- Default Background for when no album art is available -->
+        <Border x:Name="DefaultBackgroundContainer" Grid.RowSpan="3">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF1e3c72" Offset="0"/>
+                    <GradientStop Color="#FF2a5298" Offset="0.5"/>
+                    <GradientStop Color="#FF1e3c72" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Opacity" Value="0.3"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentSong.AlbumArt, Converter={StaticResource NotNullToBooleanConverter}}" Value="True">
+                            <Setter Property="Opacity" Value="0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
+        
+        <!-- Multi-layer Gradient Overlay for better contrast and depth -->
+        <Border Grid.RowSpan="3">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#50000000" Offset="0"/>
+                    <GradientStop Color="#30000000" Offset="0.4"/>
+                    <GradientStop Color="#60000000" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
 
         <!-- Custom Title Bar -->
         <Grid Grid.Row="0" Height="32" Background="Transparent" x:Name="TitleBarGrid">
