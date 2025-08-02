@@ -146,14 +146,6 @@ public partial class MainWindow : FluentWindow
         }
     }
 
-    private void PlaylistSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.AddedItems.Count > 0 && e.AddedItems[0] is Models.Song selectedSong && _viewModel != null)
-        {
-            _viewModel.CurrentSong = selectedSong;
-        }
-    }
-
     private ScrollViewer? GetScrollViewer(DependencyObject o)
     {
         if (o is ScrollViewer)

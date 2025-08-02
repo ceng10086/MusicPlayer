@@ -366,8 +366,7 @@
                         </ui:TextBox.Style>
                     </ui:TextBox>
                     
-                    <ListBox Grid.Row="2" ItemsSource="{Binding FilteredPlaylist}" Background="Transparent" BorderThickness="0" AlternationCount="2"
-                             SelectionChanged="PlaylistSelectionChanged">
+                    <ListBox Grid.Row="2" ItemsSource="{Binding FilteredPlaylist}" SelectedItem="{Binding CurrentSong, Mode=TwoWay}" Background="Transparent" BorderThickness="0" AlternationCount="2">
                         <ListBox.Style>
                             <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
                                 <Style.Triggers>
